@@ -4,7 +4,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout
 import androidx.annotation.LayoutRes
-import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import com.kizitonwose.calendarview.R
 import com.kizitonwose.calendarview.model.CalendarMonth
@@ -42,16 +41,40 @@ internal class EventListBinder(
             .forEach { container.gridLayout.removeView(it) }
 
         for (event in events) {
-            addEvent(
-                calendarMonth = calendarMonth,
-                grid = container.gridLayout,
-                event = event.apiModel,
-                rowIndex = event.rowIndex,
-                columnIndex = event.columnIndex,
-                daySpan = event.daySpan,
-                leftBoundaryStart = event.leftBoundaryStart,
-                rightBoundaryEnd = event.rightBoundaryEnd,
-            )
+            when (event) {
+                is EventModel.Single -> {
+                    addEvent(
+                        calendarMonth = calendarMonth,
+                        grid = container.gridLayout,
+                        event = event.apiModel,
+                        rowIndex = event.rowIndex,
+                        columnIndex = event.columnIndex,
+                        daySpan = event.daySpan,
+                        leftBoundaryStart = event.leftBoundaryStart,
+                        rightBoundaryEnd = event.rightBoundaryEnd,
+                    )
+                }
+                is EventModel.AllDay -> {
+                    addEvent(
+                        calendarMonth = calendarMonth,
+                        grid = container.gridLayout,
+                        event = event.apiModel,
+                        rowIndex = event.rowIndex,
+                        columnIndex = event.columnIndex,
+                        daySpan = event.daySpan,
+                        leftBoundaryStart = event.leftBoundaryStart,
+                        rightBoundaryEnd = event.rightBoundaryEnd,
+                    )
+                }
+                is EventModel.Squashed -> {
+                    addSquashedEvent(
+                        calendarMonth = calendarMonth,
+                        grid = container.gridLayout,
+                        events = event.apiModels,
+                        columnIndex = event.columnIndex
+                    )
+                }
+            }
         }
     }
 
@@ -94,6 +117,37 @@ internal class EventListBinder(
                     rowSpec = GridLayout.spec(rowIndex, 1)
                     columnSpec = GridLayout.spec(columnIndex, daySpan, 1f)
                     width = columnWidth * daySpan
+                }
+            )
+
+            eventCellHolders.add(eventCellHolder)
+        }
+    }
+
+    private fun addSquashedEvent(
+        calendarMonth: CalendarMonth,
+        grid: GridLayout,
+        events: List<Event>,
+        columnIndex: Int
+    ) {
+        val eventCellView = grid.inflate(eventCellConfig.layoutRes).apply { tag = TAG_EVENT }
+
+        eventCellConfig.eventCellBinder?.let {
+            val eventCellHolder = it.create(eventCellView)
+            it.bind(
+                container = eventCellHolder,
+                yearMonth = calendarMonth.yearMonth,
+                events = events,
+                leftBoundaryStart = true,
+                rightBoundaryEnd = true
+            )
+
+            grid.addView(
+                eventCellHolder.view,
+                (eventCellView.layoutParams as GridLayout.LayoutParams).apply {
+                    rowSpec = GridLayout.spec(3, 1)
+                    columnSpec = GridLayout.spec(columnIndex, 1, 1f)
+                    width = columnWidth * 1
                 }
             )
 

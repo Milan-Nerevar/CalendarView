@@ -193,6 +193,22 @@ class Example5Fragment : BaseFragment(R.layout.example_5_fragment), HasToolbar {
                 }
             }
 
+            override fun bind(
+                container: EventViewContainer,
+                events: List<Event>,
+                yearMonth: YearMonth,
+                leftBoundaryStart: Boolean,
+                rightBoundaryEnd: Boolean
+            ) {
+                val text = "+"
+
+                container.txtTitle.text = text
+
+                container.container.setOnClickListener {
+                    Toast.makeText(requireContext(), events.joinToString { it.name }, Toast.LENGTH_LONG).show()
+                }
+            }
+
             override fun recycle(container: EventViewContainer) {
                 container.container.setOnClickListener(null)
             }
@@ -325,6 +341,20 @@ class Example5Fragment : BaseFragment(R.layout.example_5_fragment), HasToolbar {
                 "Single day event 3",
                 true,
                 start = LocalDate.now().minusDays(3)
+            ),
+            Event.AllDay(
+                "7",
+                "All day event 4",
+                true,
+                start = LocalDate.now().minusDays(3),
+                end = LocalDate.now().minusDays(3).plusDays(15)
+            ),
+            Event.AllDay(
+                "8",
+                "All day event 5",
+                true,
+                start = LocalDate.now().minusDays(3),
+                end = LocalDate.now().minusDays(3).plusDays(15)
             )
         )
 

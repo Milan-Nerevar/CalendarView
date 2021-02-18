@@ -5,9 +5,6 @@ import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
 import com.kizitonwose.calendarview.model.*
-import com.kizitonwose.calendarview.model.EventModel
-import com.kizitonwose.calendarview.model.InternalEvent
-import com.kizitonwose.calendarview.model.InternalEventWrapper
 import java.time.LocalDate
 
 internal class WeekHolder(
@@ -69,7 +66,7 @@ internal class WeekHolder(
                 }
             }
 
-        val filtered: List<EventModel> =
+        val filteredNonNormalized: List<EventModel> =
             sortedWrappersIntoRows
                 .asSequence()
                 .mapIndexed { rowIndex, list ->
@@ -95,7 +92,8 @@ internal class WeekHolder(
                                 val original = wrapper.getOriginalEvent()
 
                                 val leftBoundaryStart: Boolean = startWeekEvent == original
-                                val rightBoundaryEnd: Boolean = wrapper.getEndingEventThisWeek().start.isEqual(original.end)
+                                val rightBoundaryEnd: Boolean =
+                                    wrapper.getEndingEventThisWeek().start.isEqual(original.end)
 
                                 EventModel.AllDay(
                                     name = original.name,
@@ -114,6 +112,49 @@ internal class WeekHolder(
                 }
                 .flatten()
                 .toList()
+
+        val filteredOtherThanSquashed: List<EventModel> = filteredNonNormalized.filter { it.rowIndex < 3 }
+
+        val filteredSquashed: List<EventModel.Squashed> = filteredNonNormalized
+            .filter { it.rowIndex >= 3 }
+            .flatMap {
+                when (it) {
+                    is EventModel.Single -> listOf(
+                        EventModel.Squashed(
+                            columnIndex = it.columnIndex,
+                            rowIndex = -1,
+                            apiModels = listOf(it.apiModel)
+                        )
+                    )
+                    is EventModel.AllDay -> {
+                        val column = it.columnIndex
+                        val span = it.daySpan
+
+                        (column..(column + span)).map { columnIndex ->
+                            EventModel.Squashed(
+                                columnIndex = columnIndex,
+                                rowIndex = -1,
+                                apiModels = listOf(it.apiModel)
+                            )
+                        }
+                    }
+                    is EventModel.Squashed -> throw IllegalStateException()
+                }
+            }
+            .groupBy {
+                it.columnIndex
+            }
+            .map { (column, eventModels) ->
+                val apiModels = eventModels.flatMap { it.apiModels }
+
+                EventModel.Squashed(
+                    columnIndex = column,
+                    rowIndex = -1,
+                    apiModels = apiModels
+                )
+            }
+
+        val filtered: List<EventModel> = filteredOtherThanSquashed + filteredSquashed
 
         dayHolders.forEachIndexed { index, holder ->
             // Indices can be null if OutDateStyle is NONE. We set the

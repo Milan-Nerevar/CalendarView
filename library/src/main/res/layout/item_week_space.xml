@@ -2,6 +2,6 @@
 <View xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/space"
     android:layout_width="46dp"
-    android:layout_height="15dp"
+    android:layout_height="16dp"
     android:background="@drawable/week_space_background"
     android:tag="tag_space" />

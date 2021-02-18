@@ -23,6 +23,7 @@ interface MonthHeaderFooterBinder<T : ViewContainer> {
 interface EventCellBinder<T : ViewContainer> {
     fun create(view: View): T
     fun bind(container: T, event: Event, yearMonth: YearMonth, leftBoundaryStart: Boolean, rightBoundaryEnd: Boolean)
+    fun bind(container: T, events: List<Event>, yearMonth: YearMonth, leftBoundaryStart: Boolean, rightBoundaryEnd: Boolean)
     fun recycle(container: T) {}
 }
 
