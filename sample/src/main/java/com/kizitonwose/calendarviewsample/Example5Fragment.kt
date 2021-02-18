@@ -197,6 +197,7 @@ class Example5Fragment : BaseFragment(R.layout.example_5_fragment), HasToolbar {
                 container: EventViewContainer,
                 events: List<Event>,
                 yearMonth: YearMonth,
+                day: LocalDate,
                 leftBoundaryStart: Boolean,
                 rightBoundaryEnd: Boolean
             ) {
@@ -205,7 +206,14 @@ class Example5Fragment : BaseFragment(R.layout.example_5_fragment), HasToolbar {
                 container.txtTitle.text = text
 
                 container.container.setOnClickListener {
-                    Toast.makeText(requireContext(), events.joinToString { it.name }, Toast.LENGTH_LONG).show()
+                    val string = events.joinToString {
+                        it.name + " " + when (it) {
+                            is Event.Single -> it.start.toString()
+                            is Event.AllDay -> it.start.toString()
+                        }
+                    } + "& clicked on day " + day.toString()
+
+                    Toast.makeText(requireContext(), string, Toast.LENGTH_LONG).show()
                 }
             }
 
@@ -355,6 +363,13 @@ class Example5Fragment : BaseFragment(R.layout.example_5_fragment), HasToolbar {
                 true,
                 start = LocalDate.now().minusDays(3),
                 end = LocalDate.now().minusDays(3).plusDays(15)
+            ),
+            Event.AllDay(
+                "9",
+                "All day event 6",
+                true,
+                start = LocalDate.now(),
+                end = LocalDate.now().plusDays(15)
             )
         )
 

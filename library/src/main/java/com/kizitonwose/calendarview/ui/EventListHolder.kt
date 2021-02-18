@@ -40,11 +40,11 @@ internal class EventListHolder(private val config: EventListConfig) {
             viewContainer.view.tag = dayHash
         }
 
-        if (events != null && calendarMonth != null) {
+        if (events != null && calendarMonth != null && days != null) {
             if (!viewContainer.view.isVisible) {
                 viewContainer.view.isVisible = true
             }
-            config.eventListBinder.bind(viewContainer, events, calendarMonth)
+            config.eventListBinder.bind(viewContainer, events, calendarMonth, days)
         } else if (!viewContainer.view.isGone) {
             viewContainer.view.isGone = true
         }
@@ -66,7 +66,7 @@ internal class EventListHolder(private val config: EventListConfig) {
 internal interface InternalEventListBinder<T : ViewContainer> {
     fun postInflate(view: View, isLastWeek: Boolean)
     fun create(view: View): T
-    fun bind(container: T, events: List<EventModel>, calendarMonth: CalendarMonth)
+    fun bind(container: T, events: List<EventModel>, calendarMonth: CalendarMonth, days: List<CalendarDay>)
     fun recycle(container: T)
 }
 

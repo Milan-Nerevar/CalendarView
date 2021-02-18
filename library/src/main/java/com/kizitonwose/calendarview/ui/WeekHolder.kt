@@ -130,7 +130,7 @@ internal class WeekHolder(
                         val column = it.columnIndex
                         val span = it.daySpan
 
-                        (column..(column + span)).map { columnIndex ->
+                        (column until column + span).map { columnIndex ->
                             EventModel.Squashed(
                                 columnIndex = columnIndex,
                                 rowIndex = -1,

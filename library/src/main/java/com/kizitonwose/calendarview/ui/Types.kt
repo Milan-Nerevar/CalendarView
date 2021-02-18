@@ -4,6 +4,7 @@ import android.view.View
 import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.model.Event
+import java.time.LocalDate
 import java.time.YearMonth
 
 open class ViewContainer(val view: View)
@@ -23,7 +24,14 @@ interface MonthHeaderFooterBinder<T : ViewContainer> {
 interface EventCellBinder<T : ViewContainer> {
     fun create(view: View): T
     fun bind(container: T, event: Event, yearMonth: YearMonth, leftBoundaryStart: Boolean, rightBoundaryEnd: Boolean)
-    fun bind(container: T, events: List<Event>, yearMonth: YearMonth, leftBoundaryStart: Boolean, rightBoundaryEnd: Boolean)
+    fun bind(
+        container: T,
+        events: List<Event>,
+        yearMonth: YearMonth,
+        day: LocalDate,
+        leftBoundaryStart: Boolean,
+        rightBoundaryEnd: Boolean
+    )
     fun recycle(container: T) {}
 }
 

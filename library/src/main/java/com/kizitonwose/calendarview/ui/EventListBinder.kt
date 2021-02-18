@@ -6,6 +6,7 @@ import android.widget.GridLayout
 import androidx.annotation.LayoutRes
 import androidx.core.view.children
 import com.kizitonwose.calendarview.R
+import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.model.Event
 import com.kizitonwose.calendarview.model.EventModel
@@ -35,7 +36,12 @@ internal class EventListBinder(
         }
     }
 
-    override fun bind(container: EventListViewContainer, events: List<EventModel>, calendarMonth: CalendarMonth) {
+    override fun bind(
+        container: EventListViewContainer,
+        events: List<EventModel>,
+        calendarMonth: CalendarMonth,
+        days: List<CalendarDay>
+    ) {
         container.gridLayout.children
             .filter { it.tag == TAG_EVENT }
             .forEach { container.gridLayout.removeView(it) }
@@ -71,7 +77,8 @@ internal class EventListBinder(
                         calendarMonth = calendarMonth,
                         grid = container.gridLayout,
                         events = event.apiModels,
-                        columnIndex = event.columnIndex
+                        columnIndex = event.columnIndex,
+                        day = days[event.columnIndex]
                     )
                 }
             }
@@ -125,6 +132,7 @@ internal class EventListBinder(
     }
 
     private fun addSquashedEvent(
+        day: CalendarDay,
         calendarMonth: CalendarMonth,
         grid: GridLayout,
         events: List<Event>,
@@ -137,6 +145,7 @@ internal class EventListBinder(
             it.bind(
                 container = eventCellHolder,
                 yearMonth = calendarMonth.yearMonth,
+                day = day.date,
                 events = events,
                 leftBoundaryStart = true,
                 rightBoundaryEnd = true
